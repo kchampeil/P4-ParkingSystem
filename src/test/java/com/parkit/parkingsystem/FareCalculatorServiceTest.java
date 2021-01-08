@@ -250,24 +250,17 @@ public class FareCalculatorServiceTest {
 
     @Test
     @Tag("5PerCentDiscountForRecurringUser")
-    //TODO à compléter
     public void calculateFareUnkownTypeForRecurrentUser() {
-        //GIVEN
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+        ParkingSpot parkingSpot = new ParkingSpot(1, null, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
-        ticket.setIsRecurrentUser(false);
-
-        //WHEN
-        fareCalculatorService.calculateFare(ticket);
-
-        //THEN
-        assertEquals(0,0);
+        ticket.setIsRecurrentUser(true);
+        assertThrows(NullPointerException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
 
     @Test

@@ -86,4 +86,9 @@ public class TicketDAO {
         }
         return false;
     }
+
+    // KC créée
+    public int getNumberOfPreviousParksForUser(String vehicleRegNumber) {
+        return 0;
+    }
 }
