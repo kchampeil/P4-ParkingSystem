@@ -10,6 +10,7 @@ public class Ticket {
     private double price;
     private Date inTime;
     private Date outTime;
+    private boolean isRecurrentUser;
 
     public int getId() {
         return id;
@@ -58,4 +59,8 @@ public class Ticket {
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
     }
+
+    public void setIsRecurrentUser(boolean isRecurrentUser) { this.isRecurrentUser = isRecurrentUser;}
+
+    public boolean getIsRecurrentUser() {return isRecurrentUser;}
 }
