@@ -5,6 +5,8 @@ import com.parkit.parkingsystem.model.Ticket;
 
 import java.time.Duration;
 
+import static com.parkit.parkingsystem.constants.Fare.MINUTES_BEFORE_PAYABLE_PARKING_TIME;
+
 public class FareCalculatorService {
 
     public void calculateFare(Ticket ticket) {
@@ -18,17 +20,21 @@ public class FareCalculatorService {
         // then convert it in hours (in double type)
         double durationInHours = (double) durationBetweenInAndOut.toMinutes() / 60;
 
-        switch (ticket.getParkingSpot().getParkingType()) {
-            case CAR: {
-                ticket.setPrice(durationInHours * Fare.CAR_RATE_PER_HOUR);
-                break;
+        if (durationBetweenInAndOut.toMinutes() > MINUTES_BEFORE_PAYABLE_PARKING_TIME) {
+            switch (ticket.getParkingSpot().getParkingType()) {
+                case CAR: {
+                    ticket.setPrice(durationInHours * Fare.CAR_RATE_PER_HOUR);
+                    break;
+                }
+                case BIKE: {
+                    ticket.setPrice(durationInHours * Fare.BIKE_RATE_PER_HOUR);
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unkown Parking Type");
             }
-            case BIKE: {
-                ticket.setPrice(durationInHours * Fare.BIKE_RATE_PER_HOUR);
-                break;
-            }
-            default:
-                throw new IllegalArgumentException("Unkown Parking Type");
+        } else {
+            ticket.setPrice(0);
         }
     }
 }
