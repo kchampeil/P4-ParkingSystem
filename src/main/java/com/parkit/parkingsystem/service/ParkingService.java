@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -45,12 +46,11 @@ public class ParkingService {
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
                 //KC ajout
-                if (ticketDAO.getNumberOfPreviousParksForUser(vehicleRegNumber)>0){
-                    ticket.setIsRecurrentUser(true);
-                    //TODO à remettre en s'appuyant sur la constante pour que ça s'ajuste en fonction du discount
-                    System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount");
+                if (ticketDAO.getNumberOfPreviousParksForVehicle(vehicleRegNumber)>0){
+                    ticket.setWithDiscount(true);
+                    System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a "+ Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER+"% discount");
                 } else {
-                    ticket.setIsRecurrentUser(false);
+                    ticket.setWithDiscount(false);
                 }
                 // KC fin ajout
                 ticketDAO.saveTicket(ticket);
