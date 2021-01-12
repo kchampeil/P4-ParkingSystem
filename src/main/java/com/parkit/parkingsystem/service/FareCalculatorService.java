@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import com.parkit.parkingsystem.constants.ConversionConstants;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
@@ -9,6 +10,11 @@ import static com.parkit.parkingsystem.constants.Fare.MINUTES_BEFORE_PAYABLE_PAR
 
 public class FareCalculatorService {
 
+    /**
+     * calculate parking fare for one given ticket.
+     *
+     * @param ticket one initialized ticket
+     */
     public void calculateFare(Ticket ticket) {
         if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
             throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
@@ -18,7 +24,7 @@ public class FareCalculatorService {
         Duration durationBetweenInAndOut = Duration.between(ticket.getInTime().toInstant(),
                 ticket.getOutTime().toInstant());
         // then convert it in hours (in double type)
-        double durationInHours = (double) durationBetweenInAndOut.toMinutes() / 60;
+        double durationInHours = (double) durationBetweenInAndOut.toMinutes() / ConversionConstants.MINUTES_TO_HOUR_DIVIDER;
 
         // apply the free park advantage if duration is under the limit defined in MINUTES_BEFORE_PAYABLE_PARKING_TIME
         if (durationBetweenInAndOut.toMinutes() <= MINUTES_BEFORE_PAYABLE_PARKING_TIME) {
@@ -40,7 +46,8 @@ public class FareCalculatorService {
 
         // apply the discount PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER if recurrent user
         if (ticket.getIsRecurrentUser()) {
-            ticket.setPrice(ticket.getPrice() * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER/100)));
+            ticket.setPrice(ticket.getPrice()
+                    * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER)));
         }
     }
 }

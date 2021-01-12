@@ -59,7 +59,11 @@ public class Ticket {
         this.outTime = outTime;
     }
 
-    public void setWithDiscount(boolean withDiscount) { this.withDiscount = withDiscount;}
+    public void setWithDiscount(boolean withDiscount) {
+        this.withDiscount = withDiscount;
+    }
 
-    public boolean getIsRecurrentUser() {return withDiscount;}
+    public boolean getIsRecurrentUser() {
+        return withDiscount;
+    }
 }

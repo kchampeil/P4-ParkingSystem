@@ -88,8 +88,10 @@ public class TicketDAO {
     }
 
     // KC créée
+
     /**
-     * get the number of previous parks for a defined vehicleRegNumber
+     * get the number of previous parks for a defined vehicleRegNumber.
+     *
      * @param vehicleRegNumber
      * @return int the number of previous parks for the vehicle. Returns 0 if the vehicle never been parked
      */
