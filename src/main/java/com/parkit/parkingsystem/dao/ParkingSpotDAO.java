@@ -16,6 +16,12 @@ public class ParkingSpotDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    /**
+     * get the minimum parking number (ie  next available slot)  of the available slots for a given parking type
+     *
+     * @param parkingType
+     * @return the id of the next available parking spot
+     */
     public int getNextAvailableSlot(ParkingType parkingType) {
         Connection con = null;
         int result = -1;

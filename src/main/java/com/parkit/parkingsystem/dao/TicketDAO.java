@@ -19,6 +19,11 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    /**
+     * save the ticket in the database
+     * @param ticket
+     * @return true if ticket has been saved, false in case of exception
+     */
     public boolean saveTicket(Ticket ticket) {
         Connection con = null;
         try {
@@ -31,15 +36,22 @@ public class TicketDAO {
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
-            return ps.execute();
+            ps.execute();
+            return true;
+
         } catch (Exception ex) {
-            logger.error("Error fetching next available slot", ex);
+            logger.error("Error saving ticket", ex);
+            return false;
         } finally {
             dataBaseConfig.closeConnection(con);
-            return false;
         }
     }
 
+    /**
+     * get ticket in the database for a specified vehicle registration number
+     * @param vehicleRegNumber
+     * @return if found, a Ticket object, else null
+     */
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;

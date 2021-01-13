@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +65,7 @@ public class ParkingServiceTest {
     @Tag("processExiting")
     public void processExitingVehicleTest() {
         try {
+            //TODO-E mettre constante
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
