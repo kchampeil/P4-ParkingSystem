@@ -45,9 +45,10 @@ public class FareCalculatorService {
         }
 
         // apply the discount PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER if recurrent user
-        if (ticket.getIsRecurrentUser()) {
-            ticket.setPrice(ticket.getPrice()
-                    * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER)));
+        if (ticket.getWithDiscount()) {
+            double discountedPrice = ticket.getPrice()
+                    * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER));
+            ticket.setPrice(discountedPrice);
         }
     }
 }

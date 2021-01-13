@@ -87,13 +87,12 @@ public class TicketDAO {
         return false;
     }
 
-    // KC créée
-
     /**
-     * get the number of previous parks for a defined vehicleRegNumber.
+     * get the number of previous paid tickets for a defined vehicleRegNumber.
+     * free tickets are excluded.
      *
-     * @param vehicleRegNumber
-     * @return int the number of previous parks for the vehicle. Returns 0 if the vehicle never been parked
+     * @param vehicleRegNumber vehicle registration number
+     * @return the number of previous paid tickets for the vehicle. Returns 0 if the vehicle never been parked with payable tickets.
      */
     public int getNumberOfPreviousParksForVehicle(String vehicleRegNumber) {
         Connection con = null;
@@ -103,6 +102,7 @@ public class TicketDAO {
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_NB_OF_PREVIOUS_PARKS_FOR_USER);
             //count(ID)
             ps.setString(1, vehicleRegNumber);
+            ps.setDouble(2,0); // free tickets are excluded from the counting
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 nbOfPreviousParksForUser = rs.getInt(1);

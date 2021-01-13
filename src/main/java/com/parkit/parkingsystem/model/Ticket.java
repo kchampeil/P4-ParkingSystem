@@ -63,7 +63,7 @@ public class Ticket {
         this.withDiscount = withDiscount;
     }
 
-    public boolean getIsRecurrentUser() {
+    public boolean getWithDiscount() {
         return withDiscount;
     }
 }

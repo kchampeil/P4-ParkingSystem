@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.SQLException;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +57,10 @@ public class ParkingServiceTest {
     }
 
  */
+
+    // ---------------------------------------------------------------
+    //                   processExiting tests
+    // ---------------------------------------------------------------
 
     @Test
     @Tag("processExiting")
@@ -143,25 +147,39 @@ public class ParkingServiceTest {
 
     }
 
-
-
-    // TOASK à voir avec Mathieu
-    /*@Test
+    //TOASK est-ce qu'on vérifie le type de message retour et comment ?
+    @Test
     @Tag("processExiting")
-    public void processExitingVehicleTestForUnknownVehicleRegNumber() throws SQLException, ClassNotFoundException {
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber("ABCDEF");
+    @DisplayName("Given an unknown vehicle RegNumber when exiting the park then no Ticket and no ParkingSpot have been updated")
+    public void processExitingVehicleTestForUnknownVehicleRegNumber() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
-        when(ticketDAO.getTicket(anyString())).thenThrow(new SQLException());
-        assertThrows(SQLException.class, () -> parkingService.processExitingVehicle());
+            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+            Ticket ticket = new Ticket();
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber("ABCDEF");
+
+            when(ticketDAO.getTicket(anyString())).thenReturn(null);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set up test mock objects");
+        }
+
+        parkingService.processExitingVehicle();
 
         verify(ticketDAO, Mockito.times(1)).getTicket(anyString());
-    }*/
+        verify(ticketDAO, Mockito.times(0)).updateTicket(any(Ticket.class));
+        verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
 
+    }
 
+    // ---------------------------------------------------------------
+    //                   processIncoming tests
+    // ---------------------------------------------------------------
     @Test
     @Tag("processIncoming")
     @DisplayName("Given a car recurrent user when entering the park then ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
@@ -169,6 +187,7 @@ public class ParkingServiceTest {
         //GIVEN
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+
             when(inputReaderUtil.readSelection()).thenReturn(1); //CAR
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
@@ -205,6 +224,7 @@ public class ParkingServiceTest {
         //GIVEN
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+
             when(inputReaderUtil.readSelection()).thenReturn(2); //BIKE
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
@@ -275,6 +295,7 @@ public class ParkingServiceTest {
         //GIVEN
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+
             when(inputReaderUtil.readSelection()).thenReturn(2); //BIKE
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
@@ -335,35 +356,41 @@ public class ParkingServiceTest {
     }
 
 
-}
-//TOASK
- /*   @Test
+    //TOASK est-ce qu'on vérifie le type de message retour et comment ?
+    @Test
     @Tag("processIncoming")
-    @DisplayName("Given an unknown vehicle type when entering the park then Exception")
+    @DisplayName("Given an unknown vehicle type when entering the park then no ParkingSpot has been updated and no Ticket has been saved")
     public void processIncomingVehicleTestForUnknownType() {
-        //GIVEN
-        ParkingSpot parkingSpot = new ParkingSpot(1, null, false);
 
+        //GIVEN
+        try {
+            when(inputReaderUtil.readSelection()).thenReturn(100); // correct types are only 1 or 2
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set up test mock objects");
+        }
+
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
         Ticket ticket = new Ticket();
         ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
         ticket.setParkingSpot(parkingSpot);
         ticket.setVehicleRegNumber("ABCDEF");
         ticket.setWithDiscount(false);
 
-        when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(parkingSpotDAO.getNextAvailableSlot(null)).thenThrow(new SQLException());
-        when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
-        when(ticketDAO.getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber())).thenReturn(0);
+        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
         //WHEN
-        assertThrows(SQLException.class, () -> parkingService.processIncomingVehicle());
+        parkingService.processIncomingVehicle();
 
         //THEN
-        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
-        verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.times(0)).getNumberOfPreviousParksForVehicle(anyString());
+        verify(ticketDAO, Mockito.times(0)).saveTicket(any(Ticket.class));
+
     }
-*/
+
+}
 //TODO-H ajouter un test avec un retour accès bdd en exception
 //processIncomingWithSQLException à faire et Display name à faire
     /*@Test
