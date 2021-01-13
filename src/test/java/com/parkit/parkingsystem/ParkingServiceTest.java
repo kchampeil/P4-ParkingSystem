@@ -91,7 +91,6 @@ public class ParkingServiceTest {
 
     }
 
-    // KC
     //TODO-H à revoir si test du dernier ticket ou pas
     @Test
     @Tag("processExiting")
@@ -404,7 +403,6 @@ public class ParkingServiceTest {
         ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
         ticket.setParkingSpot(parkingSpot);
         ticket.setVehicleRegNumber("ABCDEF");
-        // KC ajouté
         ticket.setWithDiscount(true);
 
         when(inputReaderUtil.readSelection()).thenReturn(1);

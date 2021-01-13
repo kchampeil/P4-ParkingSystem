@@ -51,14 +51,15 @@ public class ParkingService {
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
-                //KC ajout
+
+                // if recurrent user, then he will get discount
                 if (ticketDAO.getNumberOfPreviousParksForVehicle(vehicleRegNumber) > 0) {
                     ticket.setWithDiscount(true);
                     System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a " + Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER + "% discount");
                 } else {
                     ticket.setWithDiscount(false);
                 }
-                // KC fin ajout
+
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());
