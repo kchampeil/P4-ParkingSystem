@@ -21,6 +21,7 @@ public class TicketDAO {
 
     /**
      * save the ticket in the database
+     *
      * @param ticket
      * @return true if ticket has been saved, false in case of exception
      */
@@ -29,13 +30,14 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, WITH_DISCOUNT)
             //ps.setInt(1,ticket.getId());
             ps.setInt(1, ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
+            ps.setBoolean(6,ticket.getWithDiscount());
             ps.execute();
             return true;
 
@@ -49,6 +51,7 @@ public class TicketDAO {
 
     /**
      * get ticket in the database for a specified vehicle registration number
+     *
      * @param vehicleRegNumber
      * @return if found, a Ticket object, else null
      */
@@ -58,7 +61,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE)
+            //PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE, WITH_DISCOUNT)
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -70,7 +73,7 @@ public class TicketDAO {
                 ticket.setPrice(rs.getDouble(3));
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
-                //TODO-E ajouter with discount
+                ticket.setWithDiscount(rs.getBoolean(7));
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -115,7 +118,7 @@ public class TicketDAO {
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_NB_OF_PREVIOUS_PARKS_FOR_USER);
             //count(ID)
             ps.setString(1, vehicleRegNumber);
-            ps.setDouble(2,0); // free tickets are excluded from the counting
+            ps.setDouble(2, 0); // free tickets are excluded from the counting
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 nbOfPreviousParksForUser = rs.getInt(1);

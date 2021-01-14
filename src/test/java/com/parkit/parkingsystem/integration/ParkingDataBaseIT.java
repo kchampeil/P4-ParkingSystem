@@ -88,7 +88,7 @@ public class ParkingDataBaseIT {
 
     @Test
     @DisplayName("Given an exiting vehicle when the exiting process is finished then, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
-    public void testParkingLotExit() {
+    public void testParkingLotExitForACar() {
         // initialize the test with an incoming car 1 hour before current time
         //TOASK pourquoi ne pas faire simplement un incoming plutôt qu'un test complet ? imbrication de tests...
         //testParkingACar();
@@ -96,7 +96,8 @@ public class ParkingDataBaseIT {
         parkingService.processIncomingVehicle();
 
         Ticket savedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
-        System.out.println("******* saved ticket id: " + savedTicket.getId() + "******\n");
+        //TTR
+        System.out.println("******* saved ticket id: " + savedTicket.getId() + " ******\n");
 
         // then exiting
         when(dateUtil.getCurrentDate()).thenReturn(new Date());
@@ -105,7 +106,8 @@ public class ParkingDataBaseIT {
         //TODO: check that the fare generated and out time are populated correctly in the database
         //TODO-M vérifier la requête SQL du getTicket (ne prend qu'un retour mais sans autre critère que le n° d'immat ?
         Ticket updatedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
-        System.out.println("******* updated ticket id: " + updatedTicket.getId() + "******\n");
+        //TTR
+        System.out.println("******* updated ticket id: " + updatedTicket.getId() + " ******\n");
 
         assertNotNull(updatedTicket.getOutTime());
         //TOASK il faut mocker l'objet Date pour gérer la durée entre in et out ?
