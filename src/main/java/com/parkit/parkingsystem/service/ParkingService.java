@@ -6,6 +6,7 @@ import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,13 +20,15 @@ public class ParkingService {
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
 
     private InputReaderUtil inputReaderUtil;
+    private DateUtil dateUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private TicketDAO ticketDAO;
 
-    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
+    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO, DateUtil dateUtil) {
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
+        this.dateUtil = dateUtil;
     }
 
     /**
@@ -43,7 +46,7 @@ public class ParkingService {
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot); //allot this parking space and mark it's availability as false
 
-                Date inTime = new Date();
+                Date inTime = dateUtil.getCurrentDate();
                 Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
                 //ticket.setId(ticketID);
@@ -130,7 +133,7 @@ public class ParkingService {
         try {
             String vehicleRegNumber = getVehicleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-            Date outTime = new Date();
+            Date outTime = dateUtil.getCurrentDate();
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
             if (ticketDAO.updateTicket(ticket)) {

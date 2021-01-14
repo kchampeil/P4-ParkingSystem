@@ -58,7 +58,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            //PARKING_NUMBER, ID, PRICE, IN_TIME, OUT_TIME, TYPE)
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -70,6 +70,7 @@ public class TicketDAO {
                 ticket.setPrice(rs.getDouble(3));
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
+                //TODO-E ajouter with discount
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);

@@ -6,6 +6,7 @@ import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.FareCalculatorService;
+import com.parkit.parkingsystem.util.DateUtil;
 import org.junit.jupiter.api.*;
 
 import java.util.Date;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
+    private static DateUtil dateUtil;
     private Ticket ticket;
 
     @BeforeAll
@@ -39,7 +41,7 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);
+        assertEquals(Fare.CAR_RATE_PER_HOUR, ticket.getPrice());
     }
 
     @Test
@@ -53,7 +55,7 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);
+        assertEquals(Fare.BIKE_RATE_PER_HOUR, ticket.getPrice());
     }
 
     @Test

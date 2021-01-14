@@ -6,7 +6,9 @@ import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.*;
 public class ParkingServiceTest {
 
     private static ParkingService parkingService;
+    private static DateUtil dateUtil;
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -31,7 +34,11 @@ public class ParkingServiceTest {
     @Mock
     private static TicketDAO ticketDAO;
 
-    //TODO-M voir mutualisation
+    //TODO-M voir mutualisation des autres inits
+    @BeforeEach
+    private void setUpPerTest(){
+        dateUtil = new DateUtil();
+    }
 /*    @BeforeEach
     private void setUpPerTest() {
         try {
@@ -78,7 +85,7 @@ public class ParkingServiceTest {
 
             when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
@@ -100,7 +107,7 @@ public class ParkingServiceTest {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
             when(ticketDAO.getTicket(anyString())).thenReturn(null); // ticket not found
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
@@ -131,7 +138,7 @@ public class ParkingServiceTest {
             when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
             when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false); // ticket update error
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
@@ -161,7 +168,7 @@ public class ParkingServiceTest {
             ticket.setVehicleRegNumber("ABCDEF");
 
             when(ticketDAO.getTicket(anyString())).thenReturn(null);
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,7 +199,7 @@ public class ParkingServiceTest {
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle("ABCDEF")).thenReturn(2);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,7 +236,7 @@ public class ParkingServiceTest {
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle("ABCDEF")).thenReturn(2);
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,7 +270,7 @@ public class ParkingServiceTest {
             when(inputReaderUtil.readSelection()).thenReturn(1);
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -299,7 +306,7 @@ public class ParkingServiceTest {
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle("ABCDEF")).thenReturn(0);
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -343,7 +350,7 @@ public class ParkingServiceTest {
         ticket.setVehicleRegNumber("ABCDEF");
         ticket.setWithDiscount(false);
 
-        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         //WHEN
         parkingService.processIncomingVehicle();
@@ -351,7 +358,7 @@ public class ParkingServiceTest {
         //THEN
         verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(0)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(0)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(ticketDAO, Mockito.times(0)).getNumberOfPreviousParksForVehicle("ABCDEF");
     }
 
 
@@ -376,7 +383,7 @@ public class ParkingServiceTest {
         ticket.setVehicleRegNumber("ABCDEF");
         ticket.setWithDiscount(false);
 
-        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         //WHEN
         parkingService.processIncomingVehicle();

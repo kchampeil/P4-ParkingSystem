@@ -6,12 +6,15 @@ import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -32,6 +35,9 @@ public class ParkingDataBaseIT {
     @Mock
     private static InputReaderUtil inputReaderUtil;
 
+    @Mock
+    private static DateUtil dateUtil;
+
     @BeforeAll
     private static void setUp() throws Exception {
         parkingSpotDAO = new ParkingSpotDAO();
@@ -39,6 +45,7 @@ public class ParkingDataBaseIT {
         ticketDAO = new TicketDAO();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
         dataBasePrepareService = new DataBasePrepareService();
+        dateUtil = new DateUtil();
     }
 
     @BeforeEach
@@ -46,6 +53,11 @@ public class ParkingDataBaseIT {
         when(inputReaderUtil.readSelection()).thenReturn(1); //CAR
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VEHICLE_REG_NUMBER_FOR_TESTS);
         dataBasePrepareService.clearDataBaseEntries();
+
+        Date wantedIncomingTime = new Date();
+        wantedIncomingTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
+        System.out.println("Wanted incoming time: " + wantedIncomingTime);
+        when(dateUtil.getCurrentDate()).thenReturn(wantedIncomingTime);
     }
 
     @AfterAll
@@ -57,7 +69,7 @@ public class ParkingDataBaseIT {
     @DisplayName("Given an incoming vehicle when the incoming process is finished then a ticket is actually saved in DB and the parking table is updated with availability")
     public void testParkingACar() {
 
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         parkingService.processIncomingVehicle();
 
         //TOASK check de l'élément mocké ?
@@ -77,18 +89,24 @@ public class ParkingDataBaseIT {
     @Test
     @DisplayName("Given an exiting vehicle when the exiting process is finished then, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
     public void testParkingLotExit() {
-        // initialize the test with an incoming car
-        testParkingACar();
-        Ticket savedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
-        System.out.println("saved ticket id: " + savedTicket.getId());
-        System.out.println("saved ticket out time: " + savedTicket.getOutTime());
+        // initialize the test with an incoming car 1 hour before current time
+        //TOASK pourquoi ne pas faire simplement un incoming plutôt qu'un test complet ? imbrication de tests...
+        //testParkingACar();
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
+        parkingService.processIncomingVehicle();
 
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        Ticket savedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
+        System.out.println("******* saved ticket id: " + savedTicket.getId() + "******\n");
+
+        // then exiting
+        when(dateUtil.getCurrentDate()).thenReturn(new Date());
         parkingService.processExitingVehicle();
 
         //TODO: check that the fare generated and out time are populated correctly in the database
         //TODO-M vérifier la requête SQL du getTicket (ne prend qu'un retour mais sans autre critère que le n° d'immat ?
         Ticket updatedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
+        System.out.println("******* updated ticket id: " + updatedTicket.getId() + "******\n");
+
         assertNotNull(updatedTicket.getOutTime());
         //TOASK il faut mocker l'objet Date pour gérer la durée entre in et out ?
         assertNotEquals(0.0, updatedTicket.getPrice());
