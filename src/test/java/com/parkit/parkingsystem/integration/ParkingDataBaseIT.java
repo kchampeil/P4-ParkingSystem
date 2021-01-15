@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,8 +111,7 @@ public class ParkingDataBaseIT {
         // check that parking spot is set to free in DB after exit
         // ie parkingSpot of the updated ticket is the next available slot for this parking type
         int updatedParkingSpotId = updatedTicket.getParkingSpot().getId();
-        int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(updatedTicket.getParkingSpot().getParkingType());
-        assertEquals(updatedParkingSpotId, nextAvailableSlot);
+        assertTrue(parkingSpotDAO.getParkingSpotAvailability(updatedParkingSpotId));
 
     }
 

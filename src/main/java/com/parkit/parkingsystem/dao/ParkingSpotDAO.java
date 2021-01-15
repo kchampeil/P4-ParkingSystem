@@ -43,6 +43,33 @@ public class ParkingSpotDAO {
         return result;
     }
 
+    /**
+     * get the availability of a given parking spot (id)
+     *
+     * @param parkingNumber parking spot id we want to check availability
+     * @return true if the parking spot is available, else false
+     */
+    public boolean getParkingSpotAvailability(int parkingNumber) {
+        Connection con = null;
+        boolean result = false;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_PARKING_SPOT_AVAILABILITY);
+            ps.setInt(1, parkingNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                result = rs.getBoolean(1);
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        } catch (Exception ex) {
+            logger.error("Error fetching slot availability", ex);
+        } finally {
+            dataBaseConfig.closeConnection(con);
+        }
+        return result;
+    }
+
     public boolean updateParking(ParkingSpot parkingSpot) {
         //update the availability fo that parking slot
         Connection con = null;
