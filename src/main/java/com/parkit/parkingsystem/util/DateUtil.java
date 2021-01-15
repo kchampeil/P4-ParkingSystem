@@ -5,7 +5,7 @@ import java.util.Date;
 public class DateUtil {
 
     /**
-     * get current Date
+     * get current Date.
      *
      * @return current date
      */

@@ -50,5 +50,7 @@ public class FareCalculatorService {
                     * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER));
             ticket.setPrice(discountedPrice);
         }
+
     }
+
 }

@@ -42,7 +42,6 @@ public class ParkingService {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
             if (parkingSpot != null && parkingSpot.getId() > 0) {
                 String vehicleRegNumber = getVehicleRegNumber();
-                //TOASK on ne devrait pas rajouter un check pour vérifier qu'il n'y a pas déjà un ticket ouvert pour ce véhicule ?
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot); //allot this parking space and mark it's availability as false
 
