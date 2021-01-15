@@ -187,7 +187,6 @@
                             <outputDirectory>${project.build.directory}/site/jacoco-merged-test-coverage-report</outputDirectory>
                         </configuration>
                     </execution>
-                    <!-- KC-fin -->
                 </executions>
             </plugin>
         </plugins>

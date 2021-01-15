@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
@@ -14,11 +15,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,30 +94,20 @@ public class ParkingDataBaseIT {
         //testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         parkingService.processIncomingVehicle();
-
         Ticket savedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
-        //TTR
-        System.out.println("******* saved ticket id: " + savedTicket.getId() + " ******\n");
 
         // then exiting
-        when(dateUtil.getCurrentDate()).thenReturn(new Date());
+        Date expectedOutTime = new Date();
+        when(dateUtil.getCurrentDate()).thenReturn(expectedOutTime);
         parkingService.processExitingVehicle();
 
-        //TODO: check that the fare generated and out time are populated correctly in the database
-        //TODO-M vérifier la requête SQL du getTicket (ne prend qu'un retour mais sans autre critère que le n° d'immat ?
-        Ticket updatedTicket = ticketDAO.getTicket(VEHICLE_REG_NUMBER_FOR_TESTS);
-        //TTR
-        System.out.println("******* updated ticket id: " + updatedTicket.getId() + " ******\n");
+        //check that the fare generated and out time are populated correctly in the database
+        double expectedPrice = Fare.CAR_RATE_PER_HOUR;
+        Ticket updatedTicket = ticketDAO.getTicketOnId(savedTicket.getId());
 
-        assertNotNull(updatedTicket.getOutTime());
-        //TOASK il faut mocker l'objet Date pour gérer la durée entre in et out ?
-        assertNotEquals(0.0, updatedTicket.getPrice());
+        assertEquals(expectedPrice, updatedTicket.getPrice());
 
-        /*
-        System.out.println("updated ticket id: " + updatedTicket.getId());
-        System.out.println("updated ticket out time:" + updatedTicket.getOutTime());
-        System.out.println("updated ticket price: " + updatedTicket.getPrice());
-        */
+        assertTrue(Math.abs(expectedOutTime.getTime()-updatedTicket.getOutTime().getTime())<1000);
 
         // check that parking spot is set to free in DB after exit
         // ie parkingSpot of the updated ticket is the next available slot for this parking type

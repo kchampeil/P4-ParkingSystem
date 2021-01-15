@@ -85,6 +85,47 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * get ticket in the database for a specified ticket id
+     *
+     * @param ticketId
+     * @return if found, a Ticket object, else null
+     */
+    public Ticket getTicketOnId(int ticketId) {
+        Connection con = null;
+        Ticket ticket = null;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET_ON_ID);
+            //PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, TYPE, WITH_DISCOUNT)
+            ps.setInt(1, ticketId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                ticket = new Ticket();
+                ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)), false);
+                ticket.setParkingSpot(parkingSpot);
+                ticket.setId(ticketId);
+                ticket.setVehicleRegNumber(rs.getString(2));
+                ticket.setPrice(rs.getDouble(3));
+                ticket.setInTime(rs.getTimestamp(4));
+                ticket.setOutTime(rs.getTimestamp(5));
+                ticket.setWithDiscount(rs.getBoolean(7));
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        } catch (Exception ex) {
+            logger.error("Error fetching next available slot", ex);
+        } finally {
+            dataBaseConfig.closeConnection(con);
+            return ticket;
+        }
+    }
+
+    /**
+     * update the price and out time of a given ticket (id) in the DB
+     * @param ticket
+     * @return true if ticket has been updated
+     */
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
         try {
