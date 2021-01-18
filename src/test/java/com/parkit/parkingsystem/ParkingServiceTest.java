@@ -71,15 +71,20 @@ public class ParkingServiceTest {
 
  */
 
-    // ---------------------------------------------------------------
-    //                   processExiting tests
-    // ---------------------------------------------------------------
+    /* ----------------------------------------------------------------------------------------------------------------------
+     *                  processExiting tests
+     * ----------------------------------------------------------------------------------------------------------------------
+     * GIVEN an parked car WHEN exiting the parking THEN ticket and parking spot are updated
+     * GIVEN an unknown vehicle registration number, WHEN exiting the park THEN Ticket and ParkingSpot have not been updated
+     * GIVEN an error when updating the ticket at the exit, WHEN exiting the park THEN ParkingSpot has not been updated
+     * GIVEN an unknown vehicle RegNumber WHEN exiting the park THEN no Ticket and no ParkingSpot have been updated
+     * -------------------------------------------------------------------------------------------------------------------- */
 
     @Test
     @Tag("processExiting")
+    @DisplayName("GIVEN an parked car WHEN exiting the parking THEN ticket and parking spot are updated")
     public void processExitingVehicleTest() {
         try {
-            //TODO-E mettre constante
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
@@ -108,7 +113,7 @@ public class ParkingServiceTest {
     //TODO-H à revoir si test du dernier ticket ou pas
     @Test
     @Tag("processExiting")
-    @DisplayName("Given an unknown vehicle regnumber, when exiting the park then Ticket and ParkingSpot have not been updated")
+    @DisplayName("GIVEN an unknown vehicle registration number, WHEN exiting the park THEN Ticket and ParkingSpot have not been updated")
     public void processExitingVehicleTestWithUnknownVehicleRegNumber() {
         //GIVEN
         try {
@@ -131,7 +136,7 @@ public class ParkingServiceTest {
 
     @Test
     @Tag("processExiting")
-    @DisplayName("Given an error when updating the ticket at the exit, when exiting the park then ParkingSpot has not been updated")
+    @DisplayName("GIVEN an error when updating the ticket at the exit, WHEN exiting the park THEN ParkingSpot has not been updated")
     public void processExitingVehicleTestWithErrorOnTicketUpdate() {
         //GIVEN
         try {
@@ -160,9 +165,10 @@ public class ParkingServiceTest {
 
     }
 
+    //TODO-E fait doublon avec le deuxième ???
     @Test
     @Tag("processExiting")
-    @DisplayName("Given an unknown vehicle RegNumber when exiting the park then no Ticket and no ParkingSpot have been updated")
+    @DisplayName("GIVEN an unknown vehicle RegNumber WHEN exiting the park THEN no Ticket and no ParkingSpot have been updated")
     public void processExitingVehicleTestForUnknownVehicleRegNumber() {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
@@ -189,12 +195,32 @@ public class ParkingServiceTest {
 
     }
 
-    // ---------------------------------------------------------------
-    //                   processIncoming tests
-    // ---------------------------------------------------------------
+
+    /* ----------------------------------------------------------------------------------------------------------------------
+     *                  processIncoming tests
+     * ----------------------------------------------------------------------------------------------------------------------
+     * GIVEN a car recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access
+     * to get the number of previous parks for user has been done
+     *
+     * TODO-E doublon avec le précédent car qq soit type user le fonctionnement est le même qq soit le type de véhicule
+     * GIVEN a bike recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access
+     * to get the number of previous parks for user has been done
+     *
+     * GIVEN a car non recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access
+     * to get the number of previous parks for user has been done
+     *
+     * TODO-E doublon avec le précédent car qq soit type user le fonctionnement est le même qq soit le type de véhicule
+     * GIVEN a bike non recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access
+     * to get the number of previous parks for user has been done
+     *
+     * GIVEN no available Parking Spot WHEN entering the park THEN no ParkingSpot has been updated and no Ticket has been saved
+     *
+     * GIVEN an unknown vehicle type WHEN entering the park THEN no ParkingSpot has been updated and no Ticket has been saved
+     * -------------------------------------------------------------------------------------------------------------------- */
+
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given a car recurrent user when entering the park then ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    @DisplayName("GIVEN a car recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
     public void processIncomingVehicleTestForCarRecurrentUser() {
         //GIVEN
         try {
@@ -211,26 +237,21 @@ public class ParkingServiceTest {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(true);
 
         //WHEN
         parkingService.processIncomingVehicle();
 
         //THEN
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
     }
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given a bike recurrent user when entering the park then ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    @DisplayName("GIVEN a bike recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
     public void processIncomingVehicleTestForBikeRecurrentUser() {
         //GIVEN
         try {
@@ -242,31 +263,25 @@ public class ParkingServiceTest {
             when(ticketDAO.getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS)).thenReturn(2);
 
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(true);
 
         //WHEN
         parkingService.processIncomingVehicle();
 
         //THEN
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
     }
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given a car non recurrent user when entering the park then ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    @DisplayName("GIVEN a car non recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
     public void processIncomingVehicleTestForCarNonRecurrentUser() {
         //GIVEN
         try {
@@ -275,33 +290,28 @@ public class ParkingServiceTest {
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR);
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
+
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(false);
-        when(ticketDAO.getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber())).thenReturn(0);
 
         //WHEN
         parkingService.processIncomingVehicle();
 
         //THEN
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
     }
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given a bike non recurrent user when entering the park then ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    @DisplayName("GIVEN a bike non recurrent user WHEN entering the park THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
     public void processIncomingVehicleTestForBikeNonRecurrentUser() {
         //GIVEN
         try {
@@ -311,56 +321,48 @@ public class ParkingServiceTest {
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS)).thenReturn(0);
+
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(true);
 
         //WHEN
         parkingService.processIncomingVehicle();
 
         //THEN
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
-        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(ticket.getVehicleRegNumber());
+        verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
     }
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given no available Parking Spot when entering the park then no ParkingSpot has been updated and no Ticket has been saved")
+    @DisplayName("GIVEN no available Parking Spot WHEN entering the park THEN no ParkingSpot has been updated and no Ticket has been saved")
     public void processIncomingVehicleTestWithUnavailableParkingSpot() {
         //GIVEN
         try {
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR);
-            //no available spot => return -1
             when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(-1);
+            //no available spot => return -1
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
 
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(false);
-
-        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
-
         //WHEN
         parkingService.processIncomingVehicle();
 
         //THEN
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(0)).saveTicket(any(Ticket.class));
         verify(ticketDAO, Mockito.times(0)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
@@ -368,25 +370,18 @@ public class ParkingServiceTest {
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("Given an unknown vehicle type when entering the park then no ParkingSpot has been updated and no Ticket has been saved")
+    @DisplayName("GIVEN an unknown vehicle type WHEN entering the park THEN no ParkingSpot has been updated and no Ticket has been saved")
     public void processIncomingVehicleTestForUnknownType() {
 
         //GIVEN
         try {
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_UNKNOWN);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to set up test mock objects");
         }
-
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
-        ticket.setWithDiscount(false);
-
-        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         //WHEN
         parkingService.processIncomingVehicle();

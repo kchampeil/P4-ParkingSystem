@@ -82,7 +82,7 @@ public class TicketDAO {
                 return ticket;
             }
         } catch (Exception ex) {
-            logger.error("Error fetching next available slot", ex);
+            logger.error("Error fetching ticket", ex);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -121,7 +121,7 @@ public class TicketDAO {
             }
 
         } catch (Exception ex) {
-            logger.error("Error fetching next available slot", ex);
+            logger.error("Error fetching ticket", ex);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -131,7 +131,8 @@ public class TicketDAO {
     }
 
     /**
-     * update the price and out time of a given ticket (id) in the DB.
+     * update in the DB a given ticket
+     * currently only the price and out time are updated
      *
      * @param ticket ticket we want to update in the DB
      * @return true if ticket has been updated
@@ -148,7 +149,7 @@ public class TicketDAO {
             int updateRowCount = ps.executeUpdate();
             return (updateRowCount == 1);
         } catch (Exception ex) {
-            logger.error("Error saving ticket info", ex);
+            logger.error("Error updating ticket info", ex);
         } finally {
             dataBaseConfig.closePreparedStatement(ps);
             dataBaseConfig.closeConnection(con);

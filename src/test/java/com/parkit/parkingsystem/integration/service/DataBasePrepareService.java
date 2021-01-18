@@ -6,12 +6,15 @@ import java.sql.Connection;
 
 public class DataBasePrepareService {
 
-    DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+    private DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
 
+    /**
+     * prepare the DB by clearing all previous entries of the TICKET table
+     * and resetting availability of parking spot in the PARKING table.
+     */
     public void clearDataBaseEntries() {
-        Connection connection = null;
-        try {
-            connection = dataBaseTestConfig.getConnection();
+
+        try (Connection connection = dataBaseTestConfig.getConnection()) {
 
             //set parking entries to available
             connection.prepareStatement("update parking set available = true").execute();
@@ -21,8 +24,6 @@ public class DataBasePrepareService {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            dataBaseTestConfig.closeConnection(connection);
         }
     }
 

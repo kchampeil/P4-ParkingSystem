@@ -17,7 +17,8 @@ public class ParkingSpotDAO {
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     /**
-     * get the minimum parking number (ie  next available slot)  of the available slots for a given parking type.
+     * get the minimum parking number (ie  next available slot) of the available slots
+     * for a given parking type.
      *
      * @param parkingType parking type
      * @return the id of the next available parking spot
@@ -48,7 +49,7 @@ public class ParkingSpotDAO {
     /**
      * get the availability of a given parking spot (id).
      *
-     * @param parkingNumber parking spot id we want to check availability
+     * @param parkingNumber parking spot id of which we want to check availability
      * @return true if the parking spot is available, else false
      */
     public boolean getParkingSpotAvailability(int parkingNumber) {
@@ -65,7 +66,7 @@ public class ParkingSpotDAO {
                 result = rs.getBoolean(1);
             }
         } catch (Exception ex) {
-            logger.error("Error fetching slot availability", ex);
+            logger.error("Error fetching spot availability", ex);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -74,8 +75,14 @@ public class ParkingSpotDAO {
         return result;
     }
 
+    /**
+     * update in the DB a given parking spot.
+     * currently only the availability is updated
+     * @param parkingSpot parking spot we want to updated
+     * @return true if the parking spot has been updated in the DB
+     */
     public boolean updateParking(ParkingSpot parkingSpot) {
-        //update the availability fo that parking slot
+
         Connection con = null;
         PreparedStatement ps = null;
         try {

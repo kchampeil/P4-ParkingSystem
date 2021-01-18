@@ -7,7 +7,6 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.testconstants.TimeTestConstants;
-import com.parkit.parkingsystem.util.DateUtil;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
-    //private static DateUtil dateUtil;
     private Ticket ticket;
 
     @BeforeAll
@@ -212,8 +210,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        double expectedDuration = (1 + Fare.MINUTES_BEFORE_PAYABLE_PARKING_TIME) / 60.0;
-        double expectedPrice = expectedDuration * Fare.CAR_RATE_PER_HOUR;
+        double expectedDurationInHour = (1 + Fare.MINUTES_BEFORE_PAYABLE_PARKING_TIME) / ConversionConstants.MINUTES_TO_HOUR_DIVIDER;
+        double expectedPrice = expectedDurationInHour * Fare.CAR_RATE_PER_HOUR;
         assertEquals(expectedPrice, ticket.getPrice());
     }
 

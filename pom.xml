@@ -281,12 +281,6 @@
                             <report>report-integration</report>
                         </reports>
                     </reportSet>
-                    <!-- TOASK TODO-H à revoir car vide
-                    <reportSet>
-                        <reports>
-                            <report>report-aggregate</report>
-                        </reports>
-                    </reportSet> -->
                 </reportSets>
             </plugin>
 

@@ -44,23 +44,19 @@ public class Ticket {
     }
 
     public Date getInTime() {
-        return new Date(inTime.getTime());
+        return inTime != null ? new Date(inTime.getTime()) : null;
     }
 
     public void setInTime(Date inTime) {
-        this.inTime = new Date(inTime.getTime());
+        this.inTime = inTime != null ? new Date(inTime.getTime()) : null;
     }
 
     public Date getOutTime() {
-        return outTime;
-        //TODO-H à voir plus tard car fait planter les tests
-        // return new Date(outTime.getTime());
+        return outTime != null ? new Date(outTime.getTime()) : null;
     }
 
     public void setOutTime(Date outTime) {
-        this.outTime = outTime;
-        //TODO-H à voir plus tard car fait planter les tests
-        // this.outTime = new Date(outTime.getTime());
+        this.outTime = outTime != null ? new Date(outTime.getTime()) : null;
     }
 
     public void setWithDiscount(boolean withDiscount) {
