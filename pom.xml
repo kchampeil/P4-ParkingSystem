@@ -8,6 +8,17 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <!-- =============================================================== -->
+    <!-- DistributionManagement -->
+    <!-- =============================================================== -->
+    <distributionManagement>
+        <site>
+            <id>P4-parking-sytem</id>
+            <url>scp://localhost/tmp/</url>
+        </site>
+    </distributionManagement>
+    <!-- KC fin -->
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -63,6 +74,13 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>3.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>4.2.0</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 
@@ -180,16 +198,99 @@
                         <id>create-merged-report</id>
                         <phase>post-integration-test</phase>
                         <goals>
-                            <goal> report</goal>
+                            <goal>report</goal>
                         </goals>
                         <configuration>
                             <dataFile>${project.build.directory}/merged.exec</dataFile>
-                            <outputDirectory>${project.build.directory}/site/jacoco-merged-test-coverage-report</outputDirectory>
+                            <outputDirectory>${project.build.directory}/site/jacoco-merged-test-coverage-report
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <!-- for maven-project-info-reports-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.9.1</version>
+                <configuration>
+                    <!-- Je veux le site en français -->
+                    <locales>fr</locales>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <!-- =============================================================== -->
+    <!-- Gestion des rapports -->
+    <!-- =============================================================== -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
+            <!-- ===== Rapport d'analyse du code par SpotBugs ===== -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                </configuration>
+            </plugin>
+            <!-- ===== Rapport d'analyse du code par Checkstyle ===== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.1</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <!-- ===== Rapport sur les tests par SureFire===== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report-only</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <!-- ===== Rapport sur de couverture des tests par JaCoCo===== -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports><!-- select non-aggregate reports -->
+                            <report>report</report>
+                            <report>report-integration</report>
+                        </reports>
+                    </reportSet>
+                    <!-- TOASK TODO-H à revoir car vide
+                    <reportSet>
+                        <reports>
+                            <report>report-aggregate</report>
+                        </reports>
+                    </reportSet> -->
+                </reportSets>
+            </plugin>
+
+        </plugins>
+    </reporting>
 
 </project>
