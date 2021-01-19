@@ -28,9 +28,9 @@ public class InputReaderUtil {
     /**
      * read the vehicle registration number entered by user.
      * @return the vehicle registration number entered by user
-     * @throws Exception
+     * @throws IllegalArgumentException IllegalArgumentException returned if vehicle registration number is null or empty
      */
-    public String readVehicleRegistrationNumber() throws Exception {
+    public String readVehicleRegistrationNumber() throws IllegalArgumentException {
         try {
             String vehicleRegNumber = scan.nextLine();
             if (vehicleRegNumber == null || vehicleRegNumber.trim().length() == 0) {

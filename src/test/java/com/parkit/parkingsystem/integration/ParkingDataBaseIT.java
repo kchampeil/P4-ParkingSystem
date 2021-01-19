@@ -13,30 +13,30 @@ import com.parkit.parkingsystem.testconstants.TimeTestConstants;
 import com.parkit.parkingsystem.testconstants.VehicleTestConstants;
 import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+
+import com.parkit.parkingsystem.util.PriceUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
-    private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+    private static final DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
 
-    private Date wantedIncomingTime = new Date();
+    private final Date wantedIncomingTime = new Date();
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -58,8 +58,10 @@ public class ParkingDataBaseIT {
     @BeforeEach
     private void setUpPerTest() throws Exception {
 
-        when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR); //CAR
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
+        when(inputReaderUtil.readSelection()).
+                thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR); //CAR
+        when(inputReaderUtil.readVehicleRegistrationNumber()).
+                thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
         wantedIncomingTime.setTime(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
         when(dateUtil.getCurrentDate()).thenReturn(wantedIncomingTime);
@@ -128,9 +130,8 @@ public class ParkingDataBaseIT {
 
 
     @Test
-    //TODO-E revoir le display name
-    @DisplayName("GIVEN an exiting vehicle of a recurrent user WHEN the last exiting process is finished\n" +
-            " THEN, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
+    @DisplayName("GIVEN an exiting vehicle of a recurrent user WHEN the exiting process is finished\n" +
+            " THEN, in the DB, the ticket has been updated with the discounted calculated fare and out time")
     public void testParkingLotExitForARecurrentUser() {
 
         System.out.println("***** Initialization with the first park *****");
@@ -164,15 +165,18 @@ public class ParkingDataBaseIT {
         parkingService.processExitingVehicle();
 
         //check that second saved ticket is different from the first
-        assertNotEquals(firstSavedTicket.getId(),secondSavedTicket.getId());
+        assertNotEquals(firstSavedTicket.getId(), secondSavedTicket.getId());
 
         //check that the discount is applied to fare generated and saved in the database
         double expectedPrice = Fare.CAR_RATE_PER_HOUR
-                *(1-Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER/ ConversionConstants.VALUE_TO_PERCENT_DIVIDER);
+                * (1 - Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER);
+        expectedPrice = PriceUtil.getRoundedPrice(expectedPrice);
         secondSavedTicket = ticketDAO.getTicketOnId(secondSavedTicket.getId());
 
         assertEquals(expectedPrice, secondSavedTicket.getPrice());
-
+        assertTrue(
+                Math.abs(wantedExitingTime.getTime() - secondSavedTicket.getOutTime().getTime())
+                        < TimeTestConstants.ONE_SECOND_IN_MILLISECONDS);
     }
 
 }

@@ -6,7 +6,7 @@ import java.sql.Connection;
 
 public class DataBasePrepareService {
 
-    private DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+    private final DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
 
     /**
      * prepare the DB by clearing all previous entries of the TICKET table
@@ -24,7 +24,7 @@ public class DataBasePrepareService {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        } 
     }
 
 

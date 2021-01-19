@@ -21,9 +21,9 @@ public class DataBaseTestConfig extends DataBaseConfig {
      * open a connection to the DB, based on the DataBaseConfig.properties.
      *
      * @return a connection
-     * @throws ClassNotFoundException
-     * @throws SQLException
-     * @throws IOException
+     * @throws ClassNotFoundException if jdbc.driver.class is not found
+     * @throws SQLException if exception while executing SQL instructions
+     * @throws IOException if exception while reading the DataBaseTestConfig.properties file
      */
     public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         logger.info("Create DB connection");

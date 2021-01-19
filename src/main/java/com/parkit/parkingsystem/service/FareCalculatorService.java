@@ -3,6 +3,7 @@ package com.parkit.parkingsystem.service;
 import com.parkit.parkingsystem.constants.ConversionConstants;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.util.PriceUtil;
 
 import java.time.Duration;
 
@@ -33,11 +34,11 @@ public class FareCalculatorService {
 
         switch (ticket.getParkingSpot().getParkingType()) {
             case CAR: {
-                ticket.setPrice(durationInHours * Fare.CAR_RATE_PER_HOUR);
+                ticket.setPrice(PriceUtil.getRoundedPrice(durationInHours * Fare.CAR_RATE_PER_HOUR));
                 break;
             }
             case BIKE: {
-                ticket.setPrice(durationInHours * Fare.BIKE_RATE_PER_HOUR);
+                ticket.setPrice(PriceUtil.getRoundedPrice(durationInHours * Fare.BIKE_RATE_PER_HOUR));
                 break;
             }
             default:
@@ -48,6 +49,7 @@ public class FareCalculatorService {
         if (ticket.getWithDiscount()) {
             double discountedPrice = ticket.getPrice()
                     * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER));
+            discountedPrice = PriceUtil.getRoundedPrice(discountedPrice);
             ticket.setPrice(discountedPrice);
         }
 
