@@ -24,7 +24,7 @@ public class DataBasePrepareService {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        }
     }
 
 

@@ -74,13 +74,6 @@
             <artifactId>maven-assembly-plugin</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
-        <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs</artifactId>
-            <version>4.2.0</version>
-            <type>pom</type>
-        </dependency>
     </dependencies>
 
     <build>
@@ -237,7 +230,7 @@
                 <version>4.2.0</version>
                 <configuration>
                     <effort>Max</effort>
-                    <threshold>Low</threshold>
+                    <threshold>medium</threshold>
                 </configuration>
             </plugin>
             <!-- ===== Rapport sur les tests par SureFire===== -->
