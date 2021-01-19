@@ -11,10 +11,7 @@ import com.parkit.parkingsystem.testconstants.TimeTestConstants;
 import com.parkit.parkingsystem.testconstants.VehicleTestConstants;
 import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,6 +25,8 @@ import static org.mockito.Mockito.*;
 public class ParkingServiceTest {
 
     private static ParkingService parkingService;
+    private static ParkingSpot parkingSpotCar;
+    private static Ticket ticket;
     private static DateUtil dateUtil;
 
     @Mock
@@ -37,9 +36,19 @@ public class ParkingServiceTest {
     @Mock
     private static TicketDAO ticketDAO;
 
+    @BeforeAll
+    private static void setUp() {
+        parkingSpotCar = new ParkingSpot(1, ParkingType.CAR, false);
+    }
+
     @BeforeEach
     private void setUpPerTest() {
         dateUtil = new DateUtil();
+
+        ticket = new Ticket();
+        ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
+        ticket.setParkingSpot(parkingSpotCar);
+        ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
     }
 
@@ -63,11 +72,6 @@ public class ParkingServiceTest {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
-            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
             when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
             when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
@@ -119,11 +123,6 @@ public class ParkingServiceTest {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
-            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
             when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
             when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false); // ticket update error
 

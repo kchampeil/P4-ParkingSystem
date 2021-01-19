@@ -173,6 +173,7 @@ public class ParkingDataBaseIT {
         expectedPrice = PriceUtil.getRoundedPrice(expectedPrice);
         secondSavedTicket = ticketDAO.getTicketOnId(secondSavedTicket.getId());
 
+        //assertEquals(expectedPrice, secondSavedTicket.getPrice());
         assertEquals(expectedPrice, secondSavedTicket.getPrice());
         assertTrue(
                 Math.abs(wantedExitingTime.getTime() - secondSavedTicket.getOutTime().getTime())
