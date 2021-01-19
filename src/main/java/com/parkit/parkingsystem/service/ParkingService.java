@@ -66,7 +66,7 @@ public class ParkingService {
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());
-                System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime);
+                System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime + "\n");
             }
         } catch (Exception e) {
             logger.error("Unable to process incoming vehicle", e);
@@ -140,7 +140,7 @@ public class ParkingService {
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime + "\n");
             } else {
                 System.out.println("Unable to update ticket information. Error occurred");
             }

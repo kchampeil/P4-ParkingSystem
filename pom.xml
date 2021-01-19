@@ -17,7 +17,6 @@
             <url>scp://localhost/tmp/</url>
         </site>
     </distributionManagement>
-    <!-- KC fin -->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
