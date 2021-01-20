@@ -79,7 +79,6 @@ public class TicketDAO {
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
                 ticket.setWithDiscount(rs.getBoolean(7));
-                return ticket;
             }
         } catch (Exception ex) {
             logger.error("Error fetching ticket", ex);

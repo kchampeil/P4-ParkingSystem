@@ -5,5 +5,5 @@ public class Fare {
     public static final double CAR_RATE_PER_HOUR = 1.5;
     public static final long MINUTES_BEFORE_PAYABLE_PARKING_TIME = 30;
     public static final double PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER = 5;
-    public static final double ROUNDING_PRECISION = 100.0; // rounding to 0.01
+    public static final int ROUNDING_PRECISION = 2; // rounding to 0.01
 }

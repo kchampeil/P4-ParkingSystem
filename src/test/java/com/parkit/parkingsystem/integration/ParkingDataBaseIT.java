@@ -13,15 +13,15 @@ import com.parkit.parkingsystem.testconstants.TimeTestConstants;
 import com.parkit.parkingsystem.testconstants.VehicleTestConstants;
 import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
-
 import com.parkit.parkingsystem.util.PriceUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +36,8 @@ public class ParkingDataBaseIT {
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
 
-    private final Date wantedIncomingTime = new Date();
+    ParkingService parkingService;
+    private Date wantedIncomingTime = new Date();
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -63,8 +64,12 @@ public class ParkingDataBaseIT {
         when(inputReaderUtil.readVehicleRegistrationNumber()).
                 thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
-        wantedIncomingTime.setTime(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
+        wantedIncomingTime.setTime(System.currentTimeMillis() - (5 * TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
+        Instant withoutMillis = wantedIncomingTime.toInstant().truncatedTo(ChronoUnit.SECONDS);
+        wantedIncomingTime = Date.from(withoutMillis);
         when(dateUtil.getCurrentDate()).thenReturn(wantedIncomingTime);
+
+        parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
 
         dataBasePrepareService.clearDataBaseEntries();
 
@@ -82,16 +87,17 @@ public class ParkingDataBaseIT {
             " THEN a ticket is actually saved in DB and the parking table is updated with availability")
     public void testParkingACar() {
 
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
-        parkingService.processIncomingVehicle();
+parkingService.processIncomingVehicle();
 
         verify(inputReaderUtil, Mockito.times(1)).readSelection();
 
-        //check that a ticket is actually saved in DB (not null when getting ticket in DB)
+        //check that a ticket is actually saved in DB
+        // ie not null when getting ticket the last ticket with outTime=null for this vehicle reg number in DB
         Ticket savedTicket = ticketDAO.getTicket(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
         assertNotNull(savedTicket);
 
-        //and Parking table is updated with availability (parkingSpot of the saved ticket is not the next available slot)
+        //and Parking table is updated with availability
+        // ie parkingSpot of the saved ticket is not the next available slot
         int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(savedTicket.getParkingSpot().getParkingType());
         assertNotEquals(savedTicket.getParkingSpot().getId(), nextAvailableSlot);
 
@@ -101,13 +107,13 @@ public class ParkingDataBaseIT {
     @DisplayName("GIVEN an exiting vehicle WHEN the exiting process is finished\n" +
             " THEN, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
     public void testParkingLotExit() {
-        // initialize the test with an incoming car 1 hour before current time
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
+        // initialize the test with an incoming car 5 hours before current time
         parkingService.processIncomingVehicle();
         Ticket savedTicket = ticketDAO.getTicket(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
-        // then exiting
+        // then exiting 1 hour later
         Date expectedOutTime = new Date();
+        expectedOutTime.setTime(wantedIncomingTime.getTime() + TimeTestConstants.ONE_HOUR_IN_MILLISECONDS);
         when(dateUtil.getCurrentDate()).thenReturn(expectedOutTime);
         parkingService.processExitingVehicle();
 
@@ -134,38 +140,34 @@ public class ParkingDataBaseIT {
             " THEN, in the DB, the ticket has been updated with the discounted calculated fare and out time")
     public void testParkingLotExitForARecurrentUser() {
 
-        System.out.println("***** Initialization with the first park *****");
-
-        // initialize the test with an incoming car 3 hours before current time
-        wantedIncomingTime.setTime(System.currentTimeMillis() - 3 * (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
-        when(dateUtil.getCurrentDate()).thenReturn(wantedIncomingTime);
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
+        // initialize the test with an incoming car (5 hours before current time)
         parkingService.processIncomingVehicle();
+
         Ticket firstSavedTicket = ticketDAO.getTicket(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
-        // then exiting 1 hour later (ie 2 hours before current time)
+        // then exiting 1 hour later
         Date wantedExitingTime = new Date();
-        wantedExitingTime.setTime(System.currentTimeMillis() - 2 * (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
+        wantedExitingTime.setTime(wantedIncomingTime.getTime() + TimeTestConstants.ONE_HOUR_IN_MILLISECONDS);
         when(dateUtil.getCurrentDate()).thenReturn(wantedExitingTime);
         parkingService.processExitingVehicle();
+
         firstSavedTicket = ticketDAO.getTicketOnId(firstSavedTicket.getId());
 
-        System.out.println("***** Second park for test *****");
-
-        // the second incoming is 1 hour before current time
-        wantedIncomingTime.setTime(System.currentTimeMillis() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
+        // the second incoming is 1 hour after
+        wantedIncomingTime.setTime(wantedExitingTime.getTime() + TimeTestConstants.ONE_HOUR_IN_MILLISECONDS);
         when(dateUtil.getCurrentDate()).thenReturn(wantedIncomingTime);
         parkingService.processIncomingVehicle();
+
         Ticket secondSavedTicket = ticketDAO.getTicket(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
+
+        //check that the second ticket is different from the first one and set with discount
+        assertNotEquals(firstSavedTicket.getId(), secondSavedTicket.getId());
         assertTrue(secondSavedTicket.getWithDiscount());
 
-        // then exiting for the second time
-        wantedExitingTime.setTime(System.currentTimeMillis());
+        // then exiting for the second time 1 hour later
+        wantedExitingTime.setTime(wantedIncomingTime.getTime() + TimeTestConstants.ONE_HOUR_IN_MILLISECONDS);
         when(dateUtil.getCurrentDate()).thenReturn(wantedExitingTime);
         parkingService.processExitingVehicle();
-
-        //check that second saved ticket is different from the first
-        assertNotEquals(firstSavedTicket.getId(), secondSavedTicket.getId());
 
         //check that the discount is applied to fare generated and saved in the database
         double expectedPrice = Fare.CAR_RATE_PER_HOUR
@@ -173,11 +175,8 @@ public class ParkingDataBaseIT {
         expectedPrice = PriceUtil.getRoundedPrice(expectedPrice);
         secondSavedTicket = ticketDAO.getTicketOnId(secondSavedTicket.getId());
 
-        //assertEquals(expectedPrice, secondSavedTicket.getPrice());
         assertEquals(expectedPrice, secondSavedTicket.getPrice());
-        assertTrue(
-                Math.abs(wantedExitingTime.getTime() - secondSavedTicket.getOutTime().getTime())
-                        < TimeTestConstants.ONE_SECOND_IN_MILLISECONDS);
+        assertEquals(wantedExitingTime.getTime(), secondSavedTicket.getOutTime().getTime());
     }
 
 }

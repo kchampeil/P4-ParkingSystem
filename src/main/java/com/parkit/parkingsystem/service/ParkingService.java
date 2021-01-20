@@ -34,7 +34,7 @@ public class ParkingService {
     /**
      * proceed incoming vehicle.
      * 1- check for available parking spot
-     * 2- set the parking spot to unavailble
+     * 2- set the parking spot to unavailable
      * 3- initialize the ticket
      */
     public void processIncomingVehicle() {
@@ -65,8 +65,8 @@ public class ParkingService {
 
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
-                System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());
-                System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime + "\n");
+                System.out.println("Please park your vehicle in spot number: " + parkingSpot.getId());
+                System.out.println("Recorded in-time for vehicle number: " + vehicleRegNumber + " is: " + inTime + "\n");
             }
         } catch (Exception e) {
             logger.error("Unable to process incoming vehicle", e);
@@ -84,7 +84,7 @@ public class ParkingService {
      * @return ParkingSpot
      */
     public ParkingSpot getNextParkingNumberIfAvailable() {
-        int parkingNumber = 0;
+        int parkingNumber;
         ParkingSpot parkingSpot = null;
         try {
             ParkingType parkingType = getVehicleType();
@@ -139,8 +139,8 @@ public class ParkingService {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime + "\n");
+                System.out.println("Please pay the parking fare: " + ticket.getPrice());
+                System.out.println("Recorded out-time for vehicle number: " + ticket.getVehicleRegNumber() + " is: " + outTime + "\n");
             } else {
                 System.out.println("Unable to update ticket information. Error occurred");
             }
