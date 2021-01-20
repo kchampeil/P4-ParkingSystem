@@ -24,7 +24,7 @@ public class FareCalculatorService {
         //Calculate the duration between enter and exit
         Duration durationBetweenInAndOut = Duration.between(ticket.getInTime().toInstant(),
                 ticket.getOutTime().toInstant());
-        // then convert it in hours (in double type)
+        // then convert it in hours
         double durationInHours = (double) durationBetweenInAndOut.toMinutes() / ConversionConstants.MINUTES_TO_HOUR_DIVIDER;
 
         // apply the free park advantage if duration is under the limit defined in MINUTES_BEFORE_PAYABLE_PARKING_TIME
