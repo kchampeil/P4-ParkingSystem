@@ -7,9 +7,11 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ParkingSpotDAO {
     private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
@@ -36,8 +38,9 @@ public class ParkingSpotDAO {
             if (rs.next()) {
                 result = rs.getInt(1);
             }
-        } catch (Exception ex) {
-            logger.error("Error fetching next available spot", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error fetching next available spot", exception);
+
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -65,8 +68,8 @@ public class ParkingSpotDAO {
             if (rs.next()) {
                 result = rs.getBoolean(1);
             }
-        } catch (Exception ex) {
-            logger.error("Error fetching spot availability", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception)  {
+            logger.error("Error fetching spot availability", exception);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -78,6 +81,7 @@ public class ParkingSpotDAO {
     /**
      * update in the DB a given parking spot.
      * currently only the availability is updated
+     *
      * @param parkingSpot parking spot we want to updated
      * @return true if the parking spot has been updated in the DB
      */
@@ -92,8 +96,8 @@ public class ParkingSpotDAO {
             ps.setInt(2, parkingSpot.getId());
             int updateRowCount = ps.executeUpdate();
             return (updateRowCount == 1);
-        } catch (Exception ex) {
-            logger.error("Error updating parking info", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception)  {
+            logger.error("Error updating parking info", exception);
             return false;
         } finally {
             dataBaseConfig.closePreparedStatement(ps);

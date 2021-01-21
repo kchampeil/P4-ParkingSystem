@@ -129,10 +129,7 @@ public class ParkingDataBaseIT {
         Ticket updatedTicket = ticketDAO.getTicketOnId(savedTicket.getId());
 
         assertEquals(expectedPrice, updatedTicket.getPrice());
-
-        assertTrue(
-                Math.abs(expectedOutTime.getTime() - updatedTicket.getOutTime().getTime())
-                        < TimeTestConstants.ONE_SECOND_IN_MILLISECONDS);
+        assertEquals(expectedOutTime.getTime(), updatedTicket.getOutTime().getTime());
 
         // check that parking spot is set to free in DB after exit
         // ie parkingSpot of the updated ticket is the next available spot for this parking type

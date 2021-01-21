@@ -30,9 +30,6 @@ public class DataBaseConfig {
     public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         logger.info("Create DB connection");
         Properties properties = new Properties();
-        // TOASK : si je ne mets pas le chemin complet il ne le trouve pas quand je lance la version prod avec le jar généré
-        //  mais si je le mets ça génère un point d'attention medium dans le rapport SpotBugs...
-        //  initialement : src\main\resources\DataBaseConfig.properties
         try (FileInputStream fileInputStream
                      = new FileInputStream("..\\src\\main\\resources\\DataBaseConfig.properties")) {
             properties.load((fileInputStream));

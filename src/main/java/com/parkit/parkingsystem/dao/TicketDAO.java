@@ -8,9 +8,11 @@ import com.parkit.parkingsystem.model.Ticket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class TicketDAO {
@@ -43,8 +45,8 @@ public class TicketDAO {
             int updateRowCount = ps.executeUpdate();
             return (updateRowCount == 1);
 
-        } catch (Exception ex) {
-            logger.error("Error saving ticket", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error saving ticket", exception);
             return false;
         } finally {
             dataBaseConfig.closePreparedStatement(ps);
@@ -80,8 +82,8 @@ public class TicketDAO {
                 ticket.setOutTime(rs.getTimestamp(5));
                 ticket.setWithDiscount(rs.getBoolean(7));
             }
-        } catch (Exception ex) {
-            logger.error("Error fetching ticket", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error fetching ticket", exception);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -119,8 +121,8 @@ public class TicketDAO {
                 ticket.setWithDiscount(rs.getBoolean(7));
             }
 
-        } catch (Exception ex) {
-            logger.error("Error fetching ticket", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error fetching ticket", exception);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -147,8 +149,8 @@ public class TicketDAO {
             ps.setInt(3, ticket.getId());
             int updateRowCount = ps.executeUpdate();
             return (updateRowCount == 1);
-        } catch (Exception ex) {
-            logger.error("Error updating ticket info", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error updating ticket info", exception);
         } finally {
             dataBaseConfig.closePreparedStatement(ps);
             dataBaseConfig.closeConnection(con);
@@ -178,8 +180,8 @@ public class TicketDAO {
             if (rs.next()) {
                 nbOfPreviousParksForUser = rs.getInt(1);
             }
-        } catch (Exception ex) {
-            logger.error("Error searching for previous parks for vehicle", ex);
+        } catch (ClassNotFoundException | SQLException | IOException exception) {
+            logger.error("Error searching for previous parks for vehicle", exception);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);

@@ -230,7 +230,7 @@
                 <version>4.2.0</version>
                 <configuration>
                     <effort>Max</effort>
-                    <threshold>Medium</threshold>
+                    <threshold>Low</threshold>
                 </configuration>
             </plugin>
             <!-- ===== Test report by SureFire===== -->

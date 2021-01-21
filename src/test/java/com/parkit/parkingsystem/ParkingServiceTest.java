@@ -153,15 +153,18 @@ public class ParkingServiceTest {
      *                  processIncoming tests
      * ----------------------------------------------------------------------------------------------------------------------
      * GIVEN a recurring user and an available parking spot WHEN entering the park
-     * THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done
+     * THEN ParkingSpot has been updated, Ticket has been saved
+     * and access to get the number of previous parks for user has been done
      *
      * GIVEN a non recurring user and an available parking spot WHEN entering the park
-     * THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done
+     * THEN ParkingSpot has been updated, Ticket has been saved
+     * and access to get the number of previous parks for user has been done
      *
      * GIVEN a known type vehicle and no available Parking Spot WHEN entering the park
      * THEN no ParkingSpot has been updated and no Ticket has been saved
      *
-     * GIVEN an unknown vehicle type WHEN entering the park THEN no ParkingSpot has been updated and no Ticket has been saved
+     * GIVEN an unknown vehicle type WHEN entering the park
+     * THEN no ParkingSpot has been updated and no Ticket has been saved
      * -------------------------------------------------------------------------------------------------------------------- */
 
     @Test
