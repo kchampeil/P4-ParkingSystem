@@ -11,7 +11,11 @@ import com.parkit.parkingsystem.testconstants.TimeTestConstants;
 import com.parkit.parkingsystem.testconstants.VehicleTestConstants;
 import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,7 +23,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
@@ -145,10 +152,10 @@ public class ParkingServiceTest {
     /* ----------------------------------------------------------------------------------------------------------------------
      *                  processIncoming tests
      * ----------------------------------------------------------------------------------------------------------------------
-     * GIVEN a recurrent user and an available parking spot WHEN entering the park
+     * GIVEN a recurring user and an available parking spot WHEN entering the park
      * THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done
      *
-     * GIVEN a non recurrent user and an available parking spot WHEN entering the park
+     * GIVEN a non recurring user and an available parking spot WHEN entering the park
      * THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done
      *
      * GIVEN a known type vehicle and no available Parking Spot WHEN entering the park
@@ -159,15 +166,15 @@ public class ParkingServiceTest {
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("GIVEN a recurrent user and an available parking spot WHEN entering the park\n" +
-            " THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
-    public void processIncomingVehicleTestForRecurrentUser() {
+    @DisplayName("GIVEN a recurring user and an available parking spot WHEN entering the park\n"
+            + " THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    public void processIncomingVehicleTestForRecurringUser() {
         //GIVEN
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR); //CAR
-            when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
+            when(parkingSpotDAO.getNextAvailableSpot(ParkingType.CAR)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS)).thenReturn(2);
 
@@ -183,7 +190,7 @@ public class ParkingServiceTest {
 
         //THEN
         verify(inputReaderUtil, Mockito.times(1)).readSelection();
-        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSpot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
         verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
@@ -192,15 +199,15 @@ public class ParkingServiceTest {
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("GIVEN a non recurrent user and an available parking spot WHEN entering the park\n" +
-            " THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
-    public void processIncomingVehicleTestForNonRecurrentUser() {
+    @DisplayName("GIVEN a non recurring user and an available parking spot WHEN entering the park\n"
+            + " THEN ParkingSpot has been updated, Ticket has been saved and access to get the number of previous parks for user has been done")
+    public void processIncomingVehicleTestForNonRecurringUser() {
         //GIVEN
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
 
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_BIKE);
-            when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
+            when(parkingSpotDAO.getNextAvailableSpot(ParkingType.BIKE)).thenReturn(1);
             when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
             when(ticketDAO.getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS)).thenReturn(0);
 
@@ -216,7 +223,7 @@ public class ParkingServiceTest {
 
         //THEN
         verify(inputReaderUtil, Mockito.times(1)).readSelection();
-        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSpot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
         verify(ticketDAO, Mockito.times(1)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);
@@ -225,13 +232,13 @@ public class ParkingServiceTest {
 
     @Test
     @Tag("processIncoming")
-    @DisplayName("GIVEN a known type vehicle and no available Parking Spot WHEN entering the park\n" +
-            " THEN no ParkingSpot has been updated and no Ticket has been saved")
+    @DisplayName("GIVEN a known type vehicle and no available Parking Spot WHEN entering the park\n"
+            + " THEN no ParkingSpot has been updated and no Ticket has been saved")
     public void processIncomingVehicleTestWithUnavailableParkingSpot() {
         //GIVEN
         try {
             when(inputReaderUtil.readSelection()).thenReturn(InteractiveShellTestsConstants.PARKING_TYPE_CAR);
-            when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(-1);
+            when(parkingSpotDAO.getNextAvailableSpot(ParkingType.CAR)).thenReturn(-1);
             //no available spot => return -1
 
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, dateUtil);
@@ -246,7 +253,7 @@ public class ParkingServiceTest {
 
         //THEN
         verify(inputReaderUtil, Mockito.times(1)).readSelection();
-        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSpot(any(ParkingType.class));
         verify(parkingSpotDAO, Mockito.times(0)).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(0)).saveTicket(any(Ticket.class));
         verify(ticketDAO, Mockito.times(0)).getNumberOfPreviousParksForVehicle(VehicleTestConstants.VEHICLE_REG_NUMBER_FOR_TESTS);

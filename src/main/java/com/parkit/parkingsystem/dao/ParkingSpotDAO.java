@@ -17,13 +17,13 @@ public class ParkingSpotDAO {
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     /**
-     * get the minimum parking number (ie  next available slot) of the available slots
+     * get the minimum parking number (ie  next available spot) of the available spots
      * for a given parking type.
      *
      * @param parkingType parking type
      * @return the id of the next available parking spot
      */
-    public int getNextAvailableSlot(ParkingType parkingType) {
+    public int getNextAvailableSpot(ParkingType parkingType) {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -37,7 +37,7 @@ public class ParkingSpotDAO {
                 result = rs.getInt(1);
             }
         } catch (Exception ex) {
-            logger.error("Error fetching next available slot", ex);
+            logger.error("Error fetching next available spot", ex);
         } finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);

@@ -14,7 +14,11 @@ import com.parkit.parkingsystem.testconstants.VehicleTestConstants;
 import com.parkit.parkingsystem.util.DateUtil;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import com.parkit.parkingsystem.util.PriceUtil;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -24,7 +28,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,11 +90,11 @@ public class ParkingDataBaseIT {
 
 
     @Test
-    @DisplayName("GIVEN an incoming vehicle WHEN the incoming process is finished\n" +
-            " THEN a ticket is actually saved in DB and the parking table is updated with availability")
+    @DisplayName("GIVEN an incoming vehicle WHEN the incoming process is finished\n"
+            + " THEN a ticket is actually saved in DB and the parking table is updated with availability")
     public void testParkingACar() {
 
-parkingService.processIncomingVehicle();
+        parkingService.processIncomingVehicle();
 
         verify(inputReaderUtil, Mockito.times(1)).readSelection();
 
@@ -97,15 +104,15 @@ parkingService.processIncomingVehicle();
         assertNotNull(savedTicket);
 
         //and Parking table is updated with availability
-        // ie parkingSpot of the saved ticket is not the next available slot
-        int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(savedTicket.getParkingSpot().getParkingType());
-        assertNotEquals(savedTicket.getParkingSpot().getId(), nextAvailableSlot);
+        // ie parkingSpot of the saved ticket is not the next available spot
+        int nextAvailableSpot = parkingSpotDAO.getNextAvailableSpot(savedTicket.getParkingSpot().getParkingType());
+        assertNotEquals(savedTicket.getParkingSpot().getId(), nextAvailableSpot);
 
     }
 
     @Test
-    @DisplayName("GIVEN an exiting vehicle WHEN the exiting process is finished\n" +
-            " THEN, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
+    @DisplayName("GIVEN an exiting vehicle WHEN the exiting process is finished\n"
+            + " THEN, in the DB, the ticket has been updated with calculated fare and out time, and parking spot is set to free")
     public void testParkingLotExit() {
         // initialize the test with an incoming car 5 hours before current time
         parkingService.processIncomingVehicle();
@@ -128,7 +135,7 @@ parkingService.processIncomingVehicle();
                         < TimeTestConstants.ONE_SECOND_IN_MILLISECONDS);
 
         // check that parking spot is set to free in DB after exit
-        // ie parkingSpot of the updated ticket is the next available slot for this parking type
+        // ie parkingSpot of the updated ticket is the next available spot for this parking type
         int updatedParkingSpotId = updatedTicket.getParkingSpot().getId();
         assertTrue(parkingSpotDAO.getParkingSpotAvailability(updatedParkingSpotId));
 
@@ -136,9 +143,9 @@ parkingService.processIncomingVehicle();
 
 
     @Test
-    @DisplayName("GIVEN an exiting vehicle of a recurrent user WHEN the exiting process is finished\n" +
-            " THEN, in the DB, the ticket has been updated with the discounted calculated fare and out time")
-    public void testParkingLotExitForARecurrentUser() {
+    @DisplayName("GIVEN an exiting vehicle of a recurring user WHEN the exiting process is finished\n"
+            + " THEN, in the DB, the ticket has been updated with the discounted calculated fare and out time")
+    public void testParkingLotExitForARecurringUser() {
 
         // initialize the test with an incoming car (5 hours before current time)
         parkingService.processIncomingVehicle();

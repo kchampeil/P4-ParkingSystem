@@ -45,7 +45,7 @@ public class FareCalculatorService {
                 throw new IllegalArgumentException("Unknown Parking Type");
         }
 
-        // apply the discount PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER if recurrent user
+        // apply the discount PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER if recurring user
         if (ticket.getWithDiscount()) {
             double discountedPrice = ticket.getPrice()
                     * (1 - (Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER / ConversionConstants.VALUE_TO_PERCENT_DIVIDER));

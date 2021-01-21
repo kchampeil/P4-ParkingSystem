@@ -13,7 +13,7 @@
     <!-- =============================================================== -->
     <distributionManagement>
         <site>
-            <id>P4-parking-sytem</id>
+            <id>P4-parking-system</id>
             <url>scp://localhost/tmp/</url>
         </site>
     </distributionManagement>
@@ -206,7 +206,7 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.9.1</version>
                 <configuration>
-                    <!-- Je veux le site en français -->
+                    <!-- french version of the site -->
                     <locales>fr</locales>
                 </configuration>
             </plugin>
@@ -214,7 +214,7 @@
     </build>
 
     <!-- =============================================================== -->
-    <!-- Gestion des rapports -->
+    <!-- Report management -->
     <!-- =============================================================== -->
     <reporting>
         <plugins>
@@ -223,17 +223,17 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.1.1</version>
             </plugin>
-            <!-- ===== Rapport d'analyse du code par SpotBugs ===== -->
+            <!-- ===== Code analysis report by SpotBugs ===== -->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.2.0</version>
                 <configuration>
                     <effort>Max</effort>
-                    <threshold>medium</threshold>
+                    <threshold>Medium</threshold>
                 </configuration>
             </plugin>
-            <!-- ===== Rapport sur les tests par SureFire===== -->
+            <!-- ===== Test report by SureFire===== -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
@@ -249,13 +249,13 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-            <!-- ===== Rapport sur de couverture des tests par JaCoCo===== -->
+            <!-- ===== Coverage reports by JaCoCo===== -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <reportSets>
                     <reportSet>
-                        <reports><!-- select non-aggregate reports -->
+                        <reports>
                             <report>report</report>
                             <report>report-integration</report>
                         </reports>

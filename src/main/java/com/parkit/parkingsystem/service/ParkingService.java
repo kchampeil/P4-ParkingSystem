@@ -55,11 +55,11 @@ public class ParkingService {
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
 
-                // if recurrent user, then he will get discount
+                // if recurring user, then he will get discount
                 if (ticketDAO.getNumberOfPreviousParksForVehicle(vehicleRegNumber) > 0) {
                     ticket.setWithDiscount(true);
-                    System.out.println("Welcome back! As a recurring user of our parking lot, " +
-                            "you'll benefit from a " + Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER + "% discount");
+                    System.out.println("Welcome back! As a recurring user of our parking lot, "
+                            + "you'll benefit from a " + Fare.PERCENTAGE_OF_DISCOUNT_FOR_RECURRING_USER + "% discount");
                 } else {
                     ticket.setWithDiscount(false);
                 }
@@ -89,16 +89,16 @@ public class ParkingService {
         ParkingSpot parkingSpot = null;
         try {
             ParkingType parkingType = getVehicleType();
-            parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
+            parkingNumber = parkingSpotDAO.getNextAvailableSpot(parkingType);
             if (parkingNumber > 0) {
                 parkingSpot = new ParkingSpot(parkingNumber, parkingType, true);
             } else {
-                throw new Exception("Error fetching parking number from DB. Parking slots might be full");
+                throw new Exception("Error fetching parking number from DB. Parking spots might be full");
             }
         } catch (IllegalArgumentException ie) {
             logger.error("Error parsing user input for type of vehicle", ie);
         } catch (Exception e) {
-            logger.error("Error fetching next available parking slot", e);
+            logger.error("Error fetching next available parking spot", e);
         }
         return parkingSpot;
     }

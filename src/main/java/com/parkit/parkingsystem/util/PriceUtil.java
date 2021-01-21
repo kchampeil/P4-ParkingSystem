@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 public class PriceUtil {
 
     /**
-     * return rounded price to Fare.ROUNDING_PRECISION
+     * return rounded price to Fare.ROUNDING_PRECISION.
      *
      * @param price to be rounded
      * @return rounded price
