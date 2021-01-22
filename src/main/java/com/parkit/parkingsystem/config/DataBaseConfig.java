@@ -1,7 +1,7 @@
 package com.parkit.parkingsystem.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static org.apache.logging.log4j.core.util.Loader.getClassLoader;
 
 /**
  * Database configuration.
@@ -30,9 +32,8 @@ public class DataBaseConfig {
     public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         logger.info("Create DB connection");
         Properties properties = new Properties();
-        try (FileInputStream fileInputStream
-                     = new FileInputStream("..\\src\\main\\resources\\DataBaseConfig.properties")) {
-            properties.load((fileInputStream));
+        try (InputStream inputStream = getClassLoader().getResourceAsStream("DataBaseConfig.properties")) {
+            properties.load(inputStream);
         }
         Class.forName(properties.getProperty("jdbc.driver.class"));
 

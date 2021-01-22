@@ -188,22 +188,16 @@ public class FareCalculatorServiceTest {
     /* ----------------------------------------------------------------------------------------------------------------------
      *                  5PerCentDiscountForRecurringUser tests
      * ----------------------------------------------------------------------------------------------------------------------
-     * GIVEN a correct vehicle type and a recurring user staying 1 hour WHEN calculating the fare
+     * GIVEN a recurring user staying 1 hour WHEN calculating the fare
      * THEN we get a 1 hour fare with discount
      *
-     * GIVEN a unknown vehicle type and a recurring user staying 1 hour WHEN calculating the fare
-     * THEN we get a NullPointerException
-     *
-     * GIVEN a correct vehicle type and a non recurring user staying 1 hour WHEN calculating the fare
+     * GIVEN a non recurring user staying 1 hour WHEN calculating the fare
      * THEN we get a 1 hour fare without discount
-     *
-     * GIVEN a car recurring user staying under the payable parking time limit WHEN calculating the fare
-     * THEN park is free
      * -------------------------------------------------------------------------------------------------------------------- */
 
     @Test
     @Tag("5PerCentDiscountForRecurringUser")
-    @DisplayName("GIVEN a correct vehicle type and a recurring user staying 1 hour WHEN calculating the fare \n"
+    @DisplayName("GIVEN a recurring user staying 1 hour WHEN calculating the fare \n"
             + " THEN we get a 1 hour fare with discount")
     public void calculateFareForRecurringUser() {
         inTime.setTime(outTime.getTime() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
@@ -222,21 +216,7 @@ public class FareCalculatorServiceTest {
 
     @Test
     @Tag("5PerCentDiscountForRecurringUser")
-    @DisplayName("GIVEN a unknown vehicle type and a recurring user staying 1 hour WHEN calculating the fare \n"
-            + " THEN we get a NullPointerException")
-    public void calculateFareUnknownTypeForRecurringUser() {
-        inTime.setTime(outTime.getTime() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
-        ticket.setInTime(inTime);
-        ticket.setParkingSpot(parkingSpotUnknown);
-        ticket.setWithDiscount(true);
-
-        assertThrows(NullPointerException.class, () -> fareCalculatorService.calculateFare(ticket));
-    }
-
-
-    @Test
-    @Tag("5PerCentDiscountForRecurringUser")
-    @DisplayName("GIVEN a correct vehicle type and a non recurring user staying 1 hour WHEN calculating the fare\n"
+    @DisplayName("GIVEN a non recurring user staying 1 hour WHEN calculating the fare\n"
             + " THEN we get a 1 hour fare without discount")
     public void calculateFareForNonRecurringUser() {
         inTime.setTime(outTime.getTime() - (TimeTestConstants.ONE_HOUR_IN_MILLISECONDS));
@@ -249,20 +229,4 @@ public class FareCalculatorServiceTest {
         assertEquals(Fare.BIKE_RATE_PER_HOUR, ticket.getPrice());
     }
 
-
-    @Test
-    @Tag("5PerCentDiscountForRecurringUser")
-    @DisplayName("GIVEN a car recurring user staying under the payable parking time limit WHEN calculating the fare\n"
-            + " THEN park is free")
-    public void calculateFareForRecurringUserWithFreeLimitMinutesParkingTime() {
-        inTime.setTime(outTime.getTime()
-                - (Fare.MINUTES_BEFORE_PAYABLE_PARKING_TIME * TimeTestConstants.MINUTES_TO_MILLISECONDS));
-        ticket.setInTime(inTime);
-        ticket.setParkingSpot(parkingSpotCar);
-        ticket.setWithDiscount(true);
-
-        fareCalculatorService.calculateFare(ticket);
-
-        assertEquals(0, ticket.getPrice());
-    }
 }
