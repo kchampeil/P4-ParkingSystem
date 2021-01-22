@@ -4,14 +4,16 @@ import com.parkit.parkingsystem.config.DataBaseConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import static org.apache.logging.log4j.core.util.Loader.getClassLoader;
 
 public class DataBaseTestConfig extends DataBaseConfig {
 
@@ -28,8 +30,8 @@ public class DataBaseTestConfig extends DataBaseConfig {
     public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         logger.info("Create DB connection");
         Properties properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream("src\\test\\resources\\DataBaseTestConfig.properties")) {
-            properties.load((fileInputStream));
+        try (InputStream inputStream = getClassLoader().getResourceAsStream("DataBaseTestConfig.properties")) {
+            properties.load(inputStream);
         }
         Class.forName(properties.getProperty("jdbc.driver.class"));
 

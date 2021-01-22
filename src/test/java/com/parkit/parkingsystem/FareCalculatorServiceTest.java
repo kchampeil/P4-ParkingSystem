@@ -234,6 +234,8 @@ public class FareCalculatorServiceTest {
     }
 
 
+
+
     @Test
     @Tag("5PerCentDiscountForRecurringUser")
     @DisplayName("GIVEN a correct vehicle type and a non recurring user staying 1 hour WHEN calculating the fare\n"
